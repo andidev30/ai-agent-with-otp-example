@@ -10,7 +10,7 @@ import {
 } from '@mastra/observability';
 import { csAgent } from './agents/cs.agent';
 import { otpSend, otpVerify } from './tools/otp.tools';
-import { accountBalanceTool, accountPointTool, accountTierTool } from './tools/account.tools';
+import { accountBalanceTool, accountPointTool, accountRedeemPointTool, accountTierTool } from './tools/account.tools';
 import { productDetail, productList } from './tools/product.tools';
 
 export const mastra = new Mastra({
@@ -18,7 +18,7 @@ export const mastra = new Mastra({
     externals: ['@duckdb/node-bindings'],
   },
   agents: { csAgent },
-  tools: { otpSend, otpVerify, accountBalanceTool, accountPointTool, accountTierTool, productList, productDetail },
+  tools: { otpSend, otpVerify, accountBalanceTool, accountPointTool, accountRedeemPointTool, accountTierTool, productList, productDetail },
   storage: new MastraCompositeStore({
     id: 'composite-storage',
     default: new LibSQLStore({

@@ -50,3 +50,21 @@ export const accountPointTool = createTool({
         };
     },
 });
+
+export const accountRedeemPointTool = createTool({
+    id: 'account_redeem_point',
+    description: 'Redeem Account Points by Phone Number',
+    inputSchema: accountInputSchema.extend({
+        point: z.number().describe('Points to redeem'),
+    }),
+    outputSchema: z.object({
+        redeemed: z.number().describe('Redeemed Points'),
+    }),
+    requireApproval: true,
+    guards: [otpVerified],
+    execute: async ({ point }) => {
+        return {
+            redeemed: point
+        };
+    },
+});

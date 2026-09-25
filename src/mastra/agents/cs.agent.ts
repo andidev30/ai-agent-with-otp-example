@@ -1,6 +1,6 @@
 import { Agent } from '@mastra/core/agent';
 import { Memory } from '@mastra/memory';
-import { accountBalanceTool, accountPointTool, accountTierTool } from '../tools/account.tools';
+import { accountBalanceTool, accountPointTool, accountRedeemPointTool, accountTierTool } from '../tools/account.tools';
 import { otpSend, otpVerify } from '../tools/otp.tools';
 import { productDetail, productList } from '../tools/product.tools';
 
@@ -25,6 +25,7 @@ export const csAgent = new Agent({
     accountBalanceTool,
     accountTierTool,
     accountPointTool,
+    accountRedeemPointTool,
     productList,
     productDetail,
   },

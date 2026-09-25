@@ -4,7 +4,7 @@ A [Mastra](https://mastra.ai) example that shows how to protect agent tools with
 
 Built with `@mastra/core` 1.71.0.
 
-The demo is a customer care agent. Anyone can browse products, but account tools (balance, tier, points) only run after the user's phone number has been verified with an OTP.
+The demo is a customer care agent. Anyone can browse products, but account tools (balance, tier, points, redeem) only run after the user's phone number has been verified with an OTP.
 
 ```ts
 export const accountBalanceTool = createTool({
@@ -51,6 +51,14 @@ export const withinBusinessHours: ToolGuard = () => {
 
 Tools that use guards must import `createTool` from `./create-tool`, not from `@mastra/core/tools`.
 
+## What a userland wrapper can't do
+
+The wrapper only works by wrapping `execute`, so a few things are out of reach without support in Mastra core:
+
+- **Guards run after approval.** For a tool with `requireApproval`, Mastra asks the user to approve before `execute` runs. The user can approve a call that the guard then denies. `account_redeem_point` shows this in Studio.
+- **Denied calls look like failures.** A guard throws inside `execute`, so Mastra wraps it as `TOOL_EXECUTION_FAILED`, records it as an exception, and marks the tool span as an error. The original `ToolGuardError` is only kept as the error's `cause`.
+- **Easy to bypass by mistake.** A tool created with Mastra's own `createTool` silently has no `guards` option.
+
 ## Project structure
 
 ```
@@ -58,7 +66,7 @@ src/mastra/
   agents/cs.agent.ts        # customer care agent
   guards/otp.guard.ts       # otpVerified guard + verification store
   tools/create-tool.ts      # createTool with `guards` option, ToolGuardError
-  tools/account.tools.ts    # balance, tier, points (guarded)
+  tools/account.tools.ts    # balance, tier, points, redeem (guarded)
   tools/otp.tools.ts        # otp_send, otp_verify
   tools/product.tools.ts    # product list and detail (public)
   index.ts                  # Mastra instance, storage, observability
@@ -94,6 +102,8 @@ Open [http://localhost:4111](http://localhost:4111), select **CS Agent** in Mast
 1. `What's my balance? My number is 08123456789.` The tool call is blocked and the agent asks you to verify.
 2. Ask it to send an OTP, then give it any code. The demo accepts every OTP.
 3. Ask for your balance again. The tool now runs.
+
+To see the approval ordering problem, restart the server (verification resets) and ask `Redeem 10 points for 08123456789.` before verifying. Studio asks you to approve the call first, and only after you approve does the guard deny it.
 
 ## Demo limitations
 
