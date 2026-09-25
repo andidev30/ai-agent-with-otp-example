@@ -1,20 +1,17 @@
 {
-  "name": "ai-agent-with-auth",
+  "name": "ai-agent-with-otp-example",
   "version": "1.0.0",
-  "description": "A general-purpose Mastra agent with a local workspace, shell tools, memory, task tracking, web access, and recurring schedules.",
-  "main": "index.js",
   "private": true,
-  "scripts": {
-    "dev": "mastra dev",
-    "build": "mastra build",
-    "start": "mastra start"
-  },
-  "keywords": [],
-  "author": "",
+  "description": "A Mastra customer care agent that verifies customers with an OTP before sharing account information.",
   "license": "Apache-2.0",
   "type": "module",
   "engines": {
     "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "mastra dev",
+    "build": "mastra build",
+    "start": "mastra start"
   },
   "dependencies": {
     "@mastra/core": "1.71.0",
@@ -25,7 +22,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@types/node": "latest",
+    "@types/node": "^26.6.2",
     "mastra": "1.31.3",
     "typescript": "^6.0.3"
   }

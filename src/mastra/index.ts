@@ -8,15 +8,17 @@ import {
   Observability,
   SensitiveDataFilter,
 } from '@mastra/observability';
-import { agent } from './agents/agent';
-import { startScheduleTool, stopScheduleTool } from './tools/schedule-tools';
+import { csAgent } from './agents/cs.agent';
+import { otpSend, otpVerify } from './tools/otp.tools';
+import { accountBalanceTool, accountPointTool, accountTierTool } from './tools/account.tools';
+import { productDetail, productList } from './tools/product.tools';
 
 export const mastra = new Mastra({
   bundler: {
     externals: ['@duckdb/node-bindings'],
   },
-  agents: { agent },
-  tools: { startScheduleTool, stopScheduleTool },
+  agents: { csAgent },
+  tools: { otpSend, otpVerify, accountBalanceTool, accountPointTool, accountTierTool, productList, productDetail },
   storage: new MastraCompositeStore({
     id: 'composite-storage',
     default: new LibSQLStore({
