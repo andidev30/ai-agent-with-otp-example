@@ -1,5 +1,6 @@
-import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
+import { otpVerified } from '../guards/otp.guard';
+import { createTool } from './create-tool';
 
 const accountInputSchema = z.object({
     phone_number: z.string().describe('Phone Number'),
@@ -12,6 +13,7 @@ export const accountBalanceTool = createTool({
     outputSchema: z.object({
         total: z.number().describe('Balance in USD'),
     }),
+    guards: [otpVerified],
     execute: async () => {
         return {
             total: 1000
@@ -26,6 +28,7 @@ export const accountTierTool = createTool({
     outputSchema: z.object({
         tier: z.string().describe('Tier Level'),
     }),
+    guards: [otpVerified],
     execute: async () => {
         return {
             tier: 'VVIP'
@@ -40,6 +43,7 @@ export const accountPointTool = createTool({
     outputSchema: z.object({
         point: z.number().describe('Total Point'),
     }),
+    guards: [otpVerified],
     execute: async () => {
         return {
             point: 15

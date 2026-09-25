@@ -1,5 +1,6 @@
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
+import { markOtpVerified } from '../guards/otp.guard';
 
 const otpResultSchema = z.object({
     success: z.boolean().describe('Is Success'),
@@ -38,6 +39,7 @@ export const otpVerify = createTool({
             success: false,
             message: 'wrong otp'
         };
+        markOtpVerified(phone_number);
         return {
             success: true,
             message: 'valid otp'
