@@ -4,7 +4,18 @@ import type { InferPublicSchema, PublicSchema } from '@mastra/core/schema';
 type SchemaLike = PublicSchema<any> | undefined;
 type InferSchema<T extends SchemaLike> = T extends PublicSchema<any> ? InferPublicSchema<T> : unknown;
 
-/** Runs before `execute`. Throw to block the call; the error message is returned to the model. */
+/** Thrown by a guard to block a tool call. The message is returned to the model as the tool error. */
+export class ToolGuardError extends Error {
+    constructor(
+        readonly code: string,
+        message: string,
+    ) {
+        super(`${code}: ${message}`);
+        this.name = 'ToolGuardError';
+    }
+}
+
+/** Runs before `execute`. Throw a `ToolGuardError` to block the call. */
 export type ToolGuard<TInput = any> = (input: TInput, context: ToolExecutionContext<any, any, any>) => void | Promise<void>;
 
 /** Mastra's `createTool` with an extra `guards` option: checks that must pass before `execute` runs. */

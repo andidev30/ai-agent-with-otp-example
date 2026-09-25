@@ -1,4 +1,4 @@
-import type { ToolGuard } from '../tools/create-tool';
+import { ToolGuardError, type ToolGuard } from '../tools/create-tool';
 
 const verifiedMsisdn = new Set<string>();
 
@@ -12,6 +12,6 @@ export const isOtpVerified = (msisdn: string): boolean => {
 
 export const otpVerified: ToolGuard<{ phone_number: string }> = ({ phone_number }) => {
     if (!isOtpVerified(phone_number)) {
-        throw new Error('UNAUTHENTICATED: Phone number not verified. Ask the user to complete OTP verification first.');
+        throw new ToolGuardError('UNAUTHENTICATED', 'Phone number not verified. Ask the user to complete OTP verification first.');
     }
 };

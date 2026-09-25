@@ -2,6 +2,8 @@
 
 A [Mastra](https://mastra.ai) example that shows how to protect agent tools with **guards**: declarative checks that must pass before a tool's `execute` runs.
 
+Built with `@mastra/core` 1.71.0.
+
 The demo is a customer care agent. Anyone can browse products, but account tools (balance, tier, points) only run after the user's phone number has been verified with an OTP.
 
 ```ts
@@ -30,18 +32,18 @@ With guards, the rule lives on the tool itself. It applies wherever the tool is 
 ## How it works
 
 - [`src/mastra/tools/create-tool.ts`](src/mastra/tools/create-tool.ts) wraps Mastra's `createTool` and adds a `guards` option. It keeps Mastra's generics, so schema inference and `execute` typing still work.
-- Guards run in order before `execute`. A guard blocks the call by throwing; the error message goes back to the model as the tool result, so the agent knows to start the OTP flow.
+- Guards run in order before `execute`. A guard blocks the call by throwing a `ToolGuardError`. Mastra reports it to the model as a tool error, so the agent knows to start the OTP flow. The error's `name` and `code` let you tell a denied call apart from a crashed one in logs and traces.
 - Guards are typed against the tool's input schema. Adding `otpVerified` to a tool without `phone_number` is a compile error.
 - [`src/mastra/guards/otp.guard.ts`](src/mastra/guards/otp.guard.ts) defines the `otpVerified` guard. `otpVerify` marks a number as verified once the OTP is accepted.
 
 Writing another guard only takes a function:
 
 ```ts
-import type { ToolGuard } from '../tools/create-tool';
+import { ToolGuardError, type ToolGuard } from '../tools/create-tool';
 
 export const withinBusinessHours: ToolGuard = () => {
     const hour = new Date().getHours();
-    if (hour < 8 || hour >= 20) throw new Error('CLOSED: Account services are available 08:00-20:00.');
+    if (hour < 8 || hour >= 20) throw new ToolGuardError('CLOSED', 'Account services are available 08:00-20:00.');
 };
 
 // guards: [otpVerified, withinBusinessHours]
@@ -55,14 +57,30 @@ Tools that use guards must import `createTool` from `./create-tool`, not from `@
 src/mastra/
   agents/cs.agent.ts        # customer care agent
   guards/otp.guard.ts       # otpVerified guard + verification store
-  tools/create-tool.ts      # createTool with `guards` option
+  tools/create-tool.ts      # createTool with `guards` option, ToolGuardError
   tools/account.tools.ts    # balance, tier, points (guarded)
   tools/otp.tools.ts        # otp_send, otp_verify
   tools/product.tools.ts    # product list and detail (public)
   index.ts                  # Mastra instance, storage, observability
+src/demo.ts                 # runs the guarded tools without an agent
 ```
 
-## Get started
+## Try it without an API key
+
+`pnpm demo` calls the tools directly, with no agent or LLM involved:
+
+```shell
+pnpm install
+pnpm demo
+```
+
+```
+1. balance before OTP: blocked -> UNAUTHENTICATED: Phone number not verified. Ask the user to complete OTP verification first.
+2. OTP verified for 08123456789
+3. balance after OTP: { total: 1000 }
+```
+
+## Run the agent
 
 Set `GOOGLE_GENERATIVE_AI_API_KEY` in `.env`, then run:
 
